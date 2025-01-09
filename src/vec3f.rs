@@ -50,6 +50,24 @@ impl Vec3f {
 		self.x * other.x + self.y * other.y + self.z * other.z
 	}
 
+	/// Return the cross product with the `other` vector.
+	///
+	/// # Example
+	///
+	/// ```
+	/// # use rsap::Vec3f;
+	/// let i = Vec3f::new(1.0, 0.0, 0.0);
+	/// let j = Vec3f::new(0.0, 1.0, 0.0);
+	/// let k = Vec3f::new(0.0, 0.0, 1.0);
+	/// assert_eq!(i.cross(&j), k);
+	pub fn cross(&self, other: &Self) -> Self {
+		let x = self.y * other.z - self.z * other.y;
+		let y = self.z * other.x - self.x * other.z;
+		let z = self.x * other.y - self.y * other.x;
+
+		Self { x, y, z }
+	}
+
 	/// Return the square of the vector's length.
 	///
 	/// # Example

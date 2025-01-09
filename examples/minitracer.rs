@@ -54,6 +54,17 @@ fn random_aabb(rng: &mut (impl Rng + SeedableRng)) -> AABB {
 	AABB::new(min, max, random_color(rng))
 }
 
+fn random_triangle(rng: &mut (impl Rng + SeedableRng)) -> Triangle {
+	Triangle::new(
+		random_point(rng),
+		random_point(rng),
+		random_point(rng),
+		random_color(rng),
+		random_color(rng),
+		random_color(rng),
+	)
+}
+
 fn main() {
 	let outfile = env::args().nth(1).unwrap_or(String::from("out.ppm"));
 
@@ -98,6 +109,10 @@ fn main() {
 		let aabb = random_aabb(&mut rng);
 		println!("{aabb:?}");
 		objects.push(Box::new(aabb));
+
+		let triangle = random_triangle(&mut rng);
+		println!("{triangle:?}");
+		objects.push(Box::new(triangle));
 	}
 
 	// render
