@@ -1,3 +1,5 @@
+pub mod function;
+pub mod functions;
 pub mod image;
 pub mod math;
 pub mod matrix44f;
