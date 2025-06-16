@@ -6,6 +6,7 @@ pub mod matrix44f;
 pub mod obj;
 pub mod option;
 pub mod vec3f;
+pub mod widgets;
 
 pub use crate::image::*;
 pub use crate::math::*;
