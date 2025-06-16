@@ -1,0 +1,6 @@
+[
+	{
+		"label": "plot",
+		"command": "just run plot"
+	}
+]
