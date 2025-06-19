@@ -76,8 +76,8 @@ impl Token {
 	pub fn precedence(&self) -> Option<u8> {
 		if let Token::Operator(op) = self {
 			Some(match op.as_str() {
-				"+" => 10,
-				"*" => 20,
+				"+" | "-" => 10,
+				"*" | "/" => 20,
 				_ => unreachable!(),
 			})
 		} else {

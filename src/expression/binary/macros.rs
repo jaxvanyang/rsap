@@ -13,8 +13,22 @@ macro_rules! add {
 }
 
 #[macro_export]
+macro_rules! sub {
+	($lhs:expr, $rhs:expr) => {
+		$crate::binary_expr!("-", $lhs, $rhs).unwrap()
+	};
+}
+
+#[macro_export]
 macro_rules! mul {
 	($lhs:expr, $rhs:expr) => {
 		$crate::binary_expr!("*", $lhs, $rhs).unwrap()
+	};
+}
+
+#[macro_export]
+macro_rules! div {
+	($lhs:expr, $rhs:expr) => {
+		$crate::binary_expr!("/", $lhs, $rhs).unwrap()
 	};
 }

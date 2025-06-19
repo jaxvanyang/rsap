@@ -280,6 +280,21 @@ mod tests {
 		let f = parse!(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(1.0).unwrap(), 2.0);
+
+		let expr = "x - x";
+		let f = parse!(expr).unwrap();
+		assert_eq!(f.to_string(), expr);
+		assert_eq!(f.eval(1.0).unwrap(), 0.0);
+
+		let expr = "x * x";
+		let f = parse!(expr).unwrap();
+		assert_eq!(f.to_string(), expr);
+		assert_eq!(f.eval(1.0).unwrap(), 1.0);
+
+		let expr = "x / x";
+		let f = parse!(expr).unwrap();
+		assert_eq!(f.to_string(), expr);
+		assert_eq!(f.eval(1.0).unwrap(), 1.0);
 	}
 
 	#[test]
