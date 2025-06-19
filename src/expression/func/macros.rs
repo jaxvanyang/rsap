@@ -74,3 +74,10 @@ macro_rules! arccot {
 		$crate::func!("arccot", $e).unwrap()
 	};
 }
+
+#[macro_export]
+macro_rules! ln {
+	($e:expr) => {
+		$crate::func!("ln", $e).unwrap()
+	};
+}

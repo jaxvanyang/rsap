@@ -3,8 +3,8 @@ mod macros;
 
 use super::{Expression, Function};
 
-pub const FUNCTION_NAMES: [&str; 10] = [
-	"sin", "cos", "tan", "cot", "sec", "csc", "arcsin", "arccos", "arctan", "arccot",
+pub const FUNCTION_NAMES: [&str; 11] = [
+	"sin", "cos", "tan", "cot", "sec", "csc", "arcsin", "arccos", "arctan", "arccot", "ln",
 ];
 
 /// Function expression.
@@ -20,6 +20,7 @@ pub enum Func {
 	Arccos(Expression),
 	Arctan(Expression),
 	Arccot(Expression),
+	Ln(Expression),
 }
 
 impl Func {
@@ -35,6 +36,7 @@ impl Func {
 			"arccos" => Some(Self::Arccos(expr.into())),
 			"arctan" => Some(Self::Arctan(expr.into())),
 			"arccot" => Some(Self::Arccot(expr.into())),
+			"ln" => Some(Self::Ln(expr.into())),
 			_ => None,
 		}
 	}
@@ -53,6 +55,7 @@ impl std::fmt::Display for Func {
 			Func::Arccos(expr) => write!(f, "arccos({expr})"),
 			Func::Arctan(expr) => write!(f, "arctan({expr})"),
 			Func::Arccot(expr) => write!(f, "arccot({expr})"),
+			Func::Ln(expr) => write!(f, "ln({expr})"),
 		}
 	}
 }
@@ -72,6 +75,7 @@ impl Function for Func {
 			Func::Arccos(expr) => expr.eval(x).is_some_and(|val| (-1.0..=1.0).contains(&val)),
 			Func::Arctan(expr) => expr.is_x_valid(x),
 			Func::Arccot(expr) => expr.is_x_valid(x),
+			Func::Ln(expr) => expr.eval(x).is_some_and(|val| val > 0.0),
 		}
 	}
 
@@ -87,7 +91,9 @@ impl Function for Func {
 			Func::Arccos(expr) => self.is_x_valid(x).then_some(expr.eval(x)?.acos()),
 			Func::Arctan(expr) => expr.eval(x).map(f32::atan),
 			Func::Arccot(expr) => expr
-				.eval(x).map(|val| std::f32::consts::FRAC_PI_2 - val.atan()),
+				.eval(x)
+				.map(|val| std::f32::consts::FRAC_PI_2 - val.atan()),
+			Func::Ln(expr) => self.is_x_valid(x).then_some(expr.eval(x)?.ln()),
 		}
 	}
 }
@@ -174,5 +180,12 @@ mod tests {
 			f.eval(1.0).unwrap(),
 			std::f32::consts::FRAC_PI_2 - 1.0f32.atan()
 		);
+	}
+
+	#[test]
+	fn test_ln() {
+		let f = ln!(var!());
+		assert!(f.eval(0.0).is_none());
+		assert_eq!(f.eval(1.0).unwrap(), 0.0);
 	}
 }
