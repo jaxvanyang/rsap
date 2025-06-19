@@ -8,18 +8,14 @@ use iced::{
 	Length::{self, Fill},
 };
 pub use message::*;
-use rsap::{f_const, f_div, f_var, function::FunctionWrapper, widgets::empty_canvas};
+use rsap::{parse, widgets::empty_canvas};
 pub use state::*;
 
 pub fn update(state: &mut State, message: Message) {
 	match message {
 		Message::InputChanged(input) => {
-			// TODO: parse input to function
-			state.function = if input.is_empty() {
-				None
-			} else {
-				Some(FunctionWrapper::new(f_div!(f_const!(1), f_var!())))
-			};
+			// TODO: show error icon in input
+			state.expression = parse!(&input).ok();
 
 			state.input = input;
 		}
@@ -42,8 +38,8 @@ pub fn view(state: &State) -> Element<Message> {
 	.align_y(Vertical::Bottom)
 	.into();
 
-	let plot_canvas: Element<_> = if let Some(f) = &state.function {
-		canvas(f.clone()).width(Fill).height(Fill).into()
+	let plot_canvas: Element<_> = if let Some(expr) = &state.expression {
+		canvas(expr.clone()).width(Fill).height(Fill).into()
 	} else {
 		empty_canvas().width(Fill).height(Fill).into()
 	};

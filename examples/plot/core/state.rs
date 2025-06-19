@@ -1,7 +1,7 @@
-use rsap::function::FunctionWrapper;
+use rsap::expression::Expression;
 
 #[derive(Default)]
 pub struct State {
-	pub function: Option<FunctionWrapper>,
+	pub expression: Option<Expression>,
 	pub input: String,
 }
