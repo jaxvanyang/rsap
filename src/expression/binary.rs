@@ -7,7 +7,7 @@ use super::{Expression, Function};
 ///
 /// ```bnf
 /// bop_rhs ::= b_op primary
-/// b_op ::= "+" | "-" | "*" | "/"
+/// b_op ::= "+" | "-" | "*" | "/" | "**"
 /// ```
 #[derive(Debug, Clone)]
 pub enum Binary {
@@ -15,6 +15,7 @@ pub enum Binary {
 	Sub((Expression, Expression)),
 	Mul((Expression, Expression)),
 	Div((Expression, Expression)),
+	Pow((Expression, Expression)),
 }
 
 impl Binary {
@@ -28,6 +29,7 @@ impl Binary {
 			"-" => Some(Self::Sub((lhs.into(), rhs.into()))),
 			"*" => Some(Self::Mul((lhs.into(), rhs.into()))),
 			"/" => Some(Self::Div((lhs.into(), rhs.into()))),
+			"**" => Some(Self::Pow((lhs.into(), rhs.into()))),
 			_ => None,
 		}
 	}
@@ -40,6 +42,7 @@ impl std::fmt::Display for Binary {
 			Binary::Sub((lhs, rhs)) => write!(f, "{lhs} - {rhs}"),
 			Binary::Mul((lhs, rhs)) => write!(f, "{lhs} * {rhs}"),
 			Binary::Div((lhs, rhs)) => write!(f, "{lhs} / {rhs}"),
+			Binary::Pow((lhs, rhs)) => write!(f, "{lhs} ** {rhs}"),
 		}
 	}
 }
@@ -51,6 +54,22 @@ impl Function for Binary {
 			Binary::Sub((lhs, rhs)) => lhs.is_x_valid(x) && rhs.is_x_valid(x),
 			Binary::Mul((lhs, rhs)) => lhs.is_x_valid(x) && rhs.is_x_valid(x),
 			Binary::Div((lhs, rhs)) => lhs.is_x_valid(x) && rhs.eval(x).is_some_and(|v| v != 0.0),
+			Binary::Pow((lhs, rhs)) => {
+				let Some(lhs) = lhs.eval(x) else {
+					return false;
+				};
+				let Some(rhs) = rhs.eval(x) else {
+					return false;
+				};
+
+				// 0.0 cannot be raised to a negative power
+				if lhs == 0.0 && rhs < 0.0 {
+					return false;
+				}
+
+				// we consider complex number invalid
+				!lhs.powf(rhs).is_nan()
+			}
 		}
 	}
 
@@ -62,6 +81,13 @@ impl Function for Binary {
 			Binary::Div((lhs, rhs)) => {
 				if self.is_x_valid(x) {
 					Some(lhs.eval(x).unwrap() / rhs.eval(x).unwrap())
+				} else {
+					None
+				}
+			}
+			Binary::Pow((lhs, rhs)) => {
+				if self.is_x_valid(x) {
+					Some(lhs.eval(x).unwrap().powf(rhs.eval(x).unwrap()))
 				} else {
 					None
 				}
@@ -107,5 +133,28 @@ mod tests {
 		let f = div!(num!(1.0), var!());
 		assert_eq!(f.eval(2.0).unwrap(), 0.5);
 		assert!(f.eval(0.0).is_none());
+	}
+
+	#[test]
+	fn test_pow() {
+		let f = pow!(var!(), num!(2.0));
+		assert_eq!(f.eval(-9.0).unwrap(), 81.0);
+		assert_eq!(f.eval(0.0).unwrap(), 0.0);
+		assert_eq!(f.eval(9.0).unwrap(), 81.0);
+
+		let f = pow!(var!(), num!(0.0));
+		assert_eq!(f.eval(-9.0).unwrap(), 1.0);
+		assert_eq!(f.eval(0.0).unwrap(), 1.0);
+		assert_eq!(f.eval(9.0).unwrap(), 1.0);
+
+		let f = pow!(var!(), num!(0.5));
+		assert!(f.eval(-9.0).is_none());
+		assert_eq!(f.eval(0.0).unwrap(), 0.0);
+		assert_eq!(f.eval(9.0).unwrap(), 3.0);
+
+		let f = pow!(var!(), num!(-2.0));
+		assert_eq!(f.eval(-9.0).unwrap(), (-9.0f32).powf(-2.0));
+		assert!(f.eval(0.0).is_none());
+		assert_eq!(f.eval(09.0).unwrap(), (9.0f32).powf(-2.0));
 	}
 }

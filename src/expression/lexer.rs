@@ -1,4 +1,5 @@
-pub const OPERATORS: [&str; 4] = ["+", "-", "*", "/"];
+// NOTE: longer first
+pub const OPERATORS: [&str; 5] = ["**", "+", "-", "*", "/"];
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
@@ -78,6 +79,7 @@ impl Token {
 			Some(match op.as_str() {
 				"+" | "-" => 10,
 				"*" | "/" => 20,
+				"**" => 30,
 				_ => unreachable!(),
 			})
 		} else {

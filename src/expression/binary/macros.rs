@@ -32,3 +32,10 @@ macro_rules! div {
 		$crate::binary_expr!("/", $lhs, $rhs).unwrap()
 	};
 }
+
+#[macro_export]
+macro_rules! pow {
+	($lhs:expr, $rhs:expr) => {
+		$crate::binary_expr!("**", $lhs, $rhs).unwrap()
+	};
+}
