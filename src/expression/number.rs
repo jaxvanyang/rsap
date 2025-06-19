@@ -28,9 +28,9 @@ impl Function for Number {
 	}
 }
 
-impl Into<Expression> for Number {
-	fn into(self) -> Expression {
-		Expression::Number(self)
+impl From<Number> for Expression {
+	fn from(val: Number) -> Self {
+		Expression::Number(val)
 	}
 }
 

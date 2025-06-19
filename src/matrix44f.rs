@@ -109,7 +109,7 @@ impl Matrix44f {
 	/// assert_eq!(m, n);
 	/// ```
 	pub fn transpose(&mut self) {
-		let m = self.clone();
+		let m = *self;
 
 		for i in 0..4 {
 			for j in 0..4 {
@@ -139,7 +139,7 @@ impl Matrix44f {
 	/// assert_eq!(m.transposed(), n);
 	/// ```
 	pub fn transposed(&self) -> Self {
-		let mut m = self.clone();
+		let mut m = *self;
 		m.transpose();
 		m
 	}

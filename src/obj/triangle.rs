@@ -66,11 +66,11 @@ impl Object for Triangle {
 		let ap = *phit - self.vertices[0];
 
 		let w = ab.cross(&ap).dot(&n) / n2;
-		assert!(0.0 <= w && w <= 1.0);
+		assert!((0.0..=1.0).contains(&w));
 		let v = ap.cross(&ac).dot(&n) / n2;
-		assert!(0.0 <= v && v <= 1.0);
+		assert!((0.0..=1.0).contains(&v));
 		let u = 1.0 - w - v;
-		assert!(0.0 <= u && u <= 1.0);
+		assert!((0.0..=1.0).contains(&u));
 
 		self.colors[0] * u + self.colors[1] * v + self.colors[2] * w
 	}

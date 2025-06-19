@@ -53,9 +53,9 @@ impl Function for Binary {
 	}
 }
 
-impl Into<Expression> for Binary {
-	fn into(self) -> Expression {
-		Expression::Binary(self.into())
+impl From<Binary> for Expression {
+	fn from(val: Binary) -> Self {
+		Expression::Binary(val.into())
 	}
 }
 

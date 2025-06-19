@@ -150,7 +150,7 @@ impl Vec3f {
 	/// assert_eq!(v.length(), 1.0);
 	/// ```
 	pub fn normalized(&self) -> Self {
-		let mut out = self.clone();
+		let mut out = *self;
 		out.normalize();
 		out
 	}

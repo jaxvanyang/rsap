@@ -77,12 +77,12 @@ impl Parser {
 	}
 
 	fn parse_primary(&mut self) -> anyhow::Result<Expression> {
-		return match self.current {
+		match self.current {
 			Token::Number(_) => self.parse_number(),
 			Token::Identifier(_) => self.parse_variable(),
 			Token::Operator(_) => self.parse_unary(),
 			_ => anyhow::bail!("not expected: {:?}", self.current),
-		};
+		}
 	}
 
 	/// Parse sub-expression (including empty) with equal or highter precedence than `lhs`.
@@ -131,7 +131,7 @@ impl Parser {
 	pub fn parse(&mut self) -> anyhow::Result<Expression> {
 		let lhs = self.parse_primary()?;
 
-		Ok(self.parse_op_rhs(lhs, 0)?)
+		self.parse_op_rhs(lhs, 0)
 	}
 }
 

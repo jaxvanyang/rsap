@@ -53,8 +53,7 @@ impl Object for Sphere {
 		let y = nhit.y.asin() / PI + 0.5;
 		let scale: f32 = 4.0;
 		let pattern = (((x * scale) % 1.0 > 0.5) ^ ((y * scale) % 1.0 > 0.5)) as u32 as f32;
-		let hit_color = self.color.mix(&(self.color * 0.8), pattern) * nhit.dot(dir).abs();
 
-		hit_color
+		self.color.mix(&(self.color * 0.8), pattern) * nhit.dot(dir).abs()
 	}
 }

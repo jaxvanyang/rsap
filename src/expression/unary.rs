@@ -39,9 +39,9 @@ impl Function for Unary {
 	}
 }
 
-impl Into<Expression> for Unary {
-	fn into(self) -> Expression {
-		Expression::Unary(self.into())
+impl From<Unary> for Expression {
+	fn from(val: Unary) -> Self {
+		Expression::Unary(val.into())
 	}
 }
 

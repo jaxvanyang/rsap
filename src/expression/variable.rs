@@ -5,7 +5,7 @@ pub struct Variable;
 
 impl Variable {
 	pub fn new() -> Self {
-		Self::default()
+		Self
 	}
 }
 
@@ -28,9 +28,9 @@ impl Function for Variable {
 	}
 }
 
-impl Into<Expression> for Variable {
-	fn into(self) -> Expression {
-		Expression::Variable(self)
+impl From<Variable> for Expression {
+	fn from(val: Variable) -> Self {
+		Expression::Variable(val)
 	}
 }
 

@@ -15,20 +15,20 @@ use std::path::Path;
 fn random_point(rng: &mut (impl Rng + SeedableRng)) -> Vec3f {
 	let limit = 5.0;
 	Vec3f::new(
-		rng.gen_range(-limit..=limit),
-		rng.gen_range(-limit..=limit),
-		rng.gen_range(-limit..=limit),
+		rng.random_range(-limit..=limit),
+		rng.random_range(-limit..=limit),
+		rng.random_range(-limit..=limit),
 	)
 }
 
 fn random_color(rng: &mut (impl Rng + SeedableRng)) -> Vec3f {
-	Vec3f::new(rng.gen(), rng.gen(), rng.gen())
+	Vec3f::new(rng.random(), rng.random(), rng.random())
 }
 
 fn random_sphere(rng: &mut (impl Rng + SeedableRng)) -> Sphere {
 	Sphere::new(
 		random_point(rng),
-		rng.gen_range(0.5..=2.0),
+		rng.random_range(0.5..=2.0),
 		random_color(rng),
 	)
 }
@@ -37,7 +37,7 @@ fn random_disk(rng: &mut (impl Rng + SeedableRng)) -> Disk {
 	Disk::new(
 		random_point(rng),
 		random_point(rng).normalized(),
-		rng.gen_range(0.5..=2.0),
+		rng.random_range(0.5..=2.0),
 		random_color(rng),
 	)
 }
@@ -45,9 +45,9 @@ fn random_disk(rng: &mut (impl Rng + SeedableRng)) -> Disk {
 fn random_aabb(rng: &mut (impl Rng + SeedableRng)) -> AABB {
 	let min = random_point(rng);
 	let size = Vec3f::new(
-		rng.gen_range(0.5..2.0),
-		rng.gen_range(0.5..2.0),
-		rng.gen_range(0.5..2.0),
+		rng.random_range(0.5..2.0),
+		rng.random_range(0.5..2.0),
+		rng.random_range(0.5..2.0),
 	);
 	let max = min + size;
 
