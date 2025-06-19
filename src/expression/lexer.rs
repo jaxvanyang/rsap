@@ -115,7 +115,7 @@ impl Lexer {
 
 		for op in OPERATORS {
 			// max length of operators is 2
-			let s: String = chars[i..(i + 2)].iter().collect();
+			let s: String = chars[i..(chars.len().min(i + 2))].iter().collect();
 			if s.starts_with(op) {
 				return Some((Token::Operator(op.to_string()), i + op.len()));
 			}
