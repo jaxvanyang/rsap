@@ -2,5 +2,9 @@
 	{
 		"label": "plot",
 		"command": "just run plot"
+	},
+	{
+		"label": "test",
+		"command": "cargo test"
 	}
 ]
