@@ -1,8 +1,8 @@
-use crate::{binary_expr, neg, num, paren, var};
+use crate::{binary_expr, func, neg, num, paren, var};
 
 use super::{
 	lexer::{Lexer, Token},
-	Expression,
+	Expression, FUNCTION_NAMES,
 };
 
 #[derive(Debug, Clone)]
@@ -58,20 +58,13 @@ impl Parser {
 	/// ```bnf
 	/// variable ::= "x"
 	/// ```
-	fn parse_variable(&mut self) -> anyhow::Result<Expression> {
-		let expr = if let Token::Identifier(id) = &self.current {
-			if id == "x" {
-				var!().into()
-			} else {
-				anyhow::bail!("only x allowed");
-			}
-		} else {
-			unreachable!()
-		};
+	fn parse_variable(&mut self) -> Expression {
+		// we know this is a "x"
+		let x = var!().into();
 
 		self.get_next();
 
-		Ok(expr)
+		x
 	}
 
 	/// Parse unary expression.
@@ -94,7 +87,7 @@ impl Parser {
 	/// Parse parenthesis expression.
 	///
 	/// ```bnf
-	/// p_expr ::= "(" expression ")"
+	/// p_expr ::= "(" sub_expr ")"
 	/// ```
 	fn parse_parenthesis(&mut self) -> anyhow::Result<Expression> {
 		assert!(self.current.is_open_parenthesis());
@@ -113,15 +106,58 @@ impl Parser {
 		Ok(paren!(expr).into())
 	}
 
+	/// Parse function expression.
+	///
+	/// ```bnf
+	/// f_expr ::= f_name "(" sub_expr ")"
+	/// f_name ::= "sin"
+	/// ```
+	fn parse_function(&mut self) -> anyhow::Result<Expression> {
+		let Token::Identifier(f_name) = self.current.clone() else {
+			anyhow::bail!("expected a function name, but found: {:?}", self.current);
+		};
+
+		if !FUNCTION_NAMES.contains(&f_name.as_str()) {
+			anyhow::bail!(
+				"expected a valid function name, but found: {:?}",
+				self.current
+			);
+		}
+
+		// eat f_name
+		self.get_next();
+
+		if !self.current.is_open_parenthesis() {
+			anyhow::bail!("expected `(`, but found: {:?}", self.current);
+		}
+
+		// eat "("
+		self.get_next();
+
+		let expr = self.parse_sub()?;
+
+		if !self.current.is_close_parenthesis() {
+			anyhow::bail!("expected `)`, but found: {:?}", self.current);
+		}
+
+		// eat ")"
+		self.get_next();
+
+		Ok(func!(f_name, expr).unwrap().into())
+	}
+
 	/// Parse primary expression.
 	///
 	/// ```bnf
-	/// primary ::= number | variable | u_expr | p_expr
+	/// primary ::= number | variable | u_expr | p_expr | f_expr
 	/// ```
 	fn parse_primary(&mut self) -> anyhow::Result<Expression> {
-		match self.current {
+		match &self.current {
 			Token::Number(_) => Ok(self.parse_number()),
-			Token::Identifier(_) => self.parse_variable(),
+			Token::Identifier(id) => match id.as_str() {
+				"x" => Ok(self.parse_variable()),
+				_ => self.parse_function(),
+			},
 			Token::Operator(_) => self.parse_unary(),
 			Token::OpenParenthesis => self.parse_parenthesis(),
 			_ => anyhow::bail!("not expected: {:?}", self.current),
@@ -308,5 +344,58 @@ mod tests {
 		let f = parse!(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(1.0).unwrap(), 4.0);
+	}
+
+	#[test]
+	fn test_parse_func() {
+		let expr = "sin(x)";
+		let f = parse!(expr).unwrap();
+		assert_eq!(f.to_string(), expr);
+		assert_eq!(f.eval(0.0).unwrap(), 0.0);
+
+		let expr = "cos(x)";
+		let f = parse!(expr).unwrap();
+		assert_eq!(f.to_string(), expr);
+		assert_eq!(f.eval(0.0).unwrap(), 1.0);
+
+		let expr = "tan(x)";
+		let f = parse!(expr).unwrap();
+		assert_eq!(f.to_string(), expr);
+		assert_eq!(f.eval(0.0).unwrap(), 0.0);
+
+		let expr = "cot(x)";
+		let f = parse!(expr).unwrap();
+		assert_eq!(f.to_string(), expr);
+		assert!(f.eval(0.0).is_none());
+
+		let expr = "sec(x)";
+		let f = parse!(expr).unwrap();
+		assert_eq!(f.to_string(), expr);
+		assert_eq!(f.eval(0.0).unwrap(), 1.0);
+
+		let expr = "csc(x)";
+		let f = parse!(expr).unwrap();
+		assert_eq!(f.to_string(), expr);
+		assert!(f.eval(0.0).is_none());
+
+		let expr = "arcsin(x)";
+		let f = parse!(expr).unwrap();
+		assert_eq!(f.to_string(), expr);
+		assert_eq!(f.eval(0.0).unwrap(), 0.0);
+
+		let expr = "arccos(x)";
+		let f = parse!(expr).unwrap();
+		assert_eq!(f.to_string(), expr);
+		assert_eq!(f.eval(0.0).unwrap(), std::f32::consts::FRAC_PI_2);
+
+		let expr = "arctan(x)";
+		let f = parse!(expr).unwrap();
+		assert_eq!(f.to_string(), expr);
+		assert_eq!(f.eval(0.0).unwrap(), 0.0);
+
+		let expr = "arccot(x)";
+		let f = parse!(expr).unwrap();
+		assert_eq!(f.to_string(), expr);
+		assert_eq!(f.eval(0.0).unwrap(), std::f32::consts::FRAC_PI_2);
 	}
 }

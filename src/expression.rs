@@ -1,6 +1,7 @@
 //! Function expression.
 
 pub mod binary;
+pub mod func;
 pub mod lexer;
 pub mod number;
 pub mod parenthesis;
@@ -10,6 +11,7 @@ pub mod unary;
 pub mod variable;
 
 pub use binary::*;
+pub use func::*;
 pub use lexer::*;
 pub use number::*;
 pub use parenthesis::*;
@@ -19,11 +21,6 @@ pub use unary::*;
 pub use variable::*;
 
 /// Top-level expression
-///
-/// ```bnf
-/// expression ::= primary (bop_rhs)*
-/// primary ::= number | variable | u_expr | p_expr
-/// ```
 #[derive(Debug, Clone)]
 pub enum Expression {
 	Number(Number),
@@ -31,6 +28,7 @@ pub enum Expression {
 	Unary(Box<Unary>),
 	Parenthesis(Box<Parenthesis>),
 	Binary(Box<Binary>),
+	Func(Box<Func>),
 }
 
 impl std::fmt::Display for Expression {
@@ -41,6 +39,7 @@ impl std::fmt::Display for Expression {
 			Expression::Unary(unary) => unary.fmt(f),
 			Expression::Parenthesis(parenthesis) => parenthesis.fmt(f),
 			Expression::Binary(binary) => binary.fmt(f),
+			Expression::Func(func) => func.fmt(f),
 		}
 	}
 }
@@ -53,6 +52,7 @@ impl Function for Expression {
 			Expression::Unary(unary) => unary.is_x_valid(x),
 			Expression::Parenthesis(parenthesis) => parenthesis.is_x_valid(x),
 			Expression::Binary(binary) => binary.is_x_valid(x),
+			Expression::Func(func) => func.is_x_valid(x),
 		}
 	}
 
@@ -63,6 +63,7 @@ impl Function for Expression {
 			Expression::Unary(unary) => unary.eval(x),
 			Expression::Parenthesis(parenthesis) => parenthesis.eval(x),
 			Expression::Binary(binary) => binary.eval(x),
+			Expression::Func(func) => func.eval(x),
 		}
 	}
 }
