@@ -1,9 +1,21 @@
-use super::UNIT;
-use crate::{function::FunctionWrapper, functions::EPS};
+use super::{EPS, UNIT};
+use crate::expression::{Expression, Function};
 use iced::{
 	widget::canvas::{self, Stroke},
 	Color, Point,
 };
+
+#[inline]
+#[must_use]
+pub fn is_equal(a: f32, b: f32) -> bool {
+	(a - b).abs() < EPS
+}
+
+#[inline]
+#[must_use]
+pub fn is_zero(x: f32) -> bool {
+	is_equal(x, 0.0)
+}
 
 #[inline]
 pub fn cartesian_to_screen(p: &Point, center: &Point) -> Point {
@@ -57,7 +69,7 @@ pub fn draw_background(frame: &mut canvas::Frame) {
 }
 
 /// Draw the function on the canvas frame.
-pub fn draw_function(frame: &mut canvas::Frame, f: &FunctionWrapper) {
+pub fn draw_function(frame: &mut canvas::Frame, expr: &Expression) {
 	let center = frame.center();
 	// half width in epsilons
 	let w = (((frame.width() / UNIT / 2.0) as i32 + 1) as f32 / EPS) as i32;
@@ -66,7 +78,7 @@ pub fn draw_function(frame: &mut canvas::Frame, f: &FunctionWrapper) {
 
 	for i in -w..w {
 		let x = i as f32 * EPS;
-		let y = if let Some(y) = f.eval(x) {
+		let y = if let Some(y) = expr.eval(x) {
 			y
 		} else {
 			if !points.is_empty() {

@@ -1,6 +1,8 @@
+pub mod consts;
 pub mod utils;
 
-use crate::function::FunctionWrapper;
+use crate::expression::Expression;
+pub use consts::*;
 use iced::{
 	mouse,
 	widget::canvas::{self, Program},
@@ -8,10 +10,7 @@ use iced::{
 };
 pub use utils::*;
 
-/// pixels per unit
-pub const UNIT: f32 = 50.0;
-
-impl<Message> Program<Message> for FunctionWrapper {
+impl<Message> Program<Message> for Expression {
 	type State = ();
 
 	fn draw(
