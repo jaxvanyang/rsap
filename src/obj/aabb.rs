@@ -11,6 +11,7 @@ pub struct AABB {
 }
 
 impl AABB {
+	#[must_use]
 	pub fn new(min: Vec3f, max: Vec3f, color: Vec3f) -> Self {
 		assert!(min.x <= max.x);
 		assert!(min.y <= max.y);
@@ -109,6 +110,8 @@ impl Object for AABB {
 			panic!("hit point ({phit:?}) not on the box ({self:?}");
 		};
 
-		self.color.mix(&(self.color * 0.8), pattern as u32 as f32) * nhit.dot(dir).abs()
+		self.color
+			.mix(&(self.color * 0.8), u32::from(pattern) as f32)
+			* nhit.dot(dir).abs()
 	}
 }

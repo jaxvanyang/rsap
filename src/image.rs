@@ -9,6 +9,7 @@ pub struct Image {
 }
 
 impl Image {
+	#[must_use]
 	pub fn new(width: usize, height: usize) -> Self {
 		Self {
 			width,
@@ -18,6 +19,7 @@ impl Image {
 	}
 
 	/// Return a byte vector of the image in P6 PPM format.
+	#[must_use]
 	pub fn to_ppm(&self) -> Vec<u8> {
 		let mut ppm = Vec::new();
 		ppm.extend_from_slice(format!("P6\n{} {}\n255\n", self.width, self.height).as_bytes());

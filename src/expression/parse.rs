@@ -85,9 +85,8 @@ impl Parser {
 			if op == "-" {
 				self.get_next();
 				return Ok(neg!(self.parse_primary()?).into());
-			} else {
-				anyhow::bail!("only - allowed");
 			}
+			anyhow::bail!("only - allowed");
 		}
 		unreachable!()
 	}

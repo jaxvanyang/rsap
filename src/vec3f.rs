@@ -17,21 +17,25 @@ impl Vec3f {
 	/// # use rsap::Vec3f;
 	/// let v = Vec3f::new(1.0, 2.0, 3.0);
 	/// ```
+	#[must_use]
 	pub fn new(x: f32, y: f32, z: f32) -> Self {
 		Self { x, y, z }
 	}
 
 	/// Create a new vector with same components.
+	#[must_use]
 	pub fn sames(x: f32) -> Self {
 		Self::new(x, x, x)
 	}
 
 	/// Create a new zero vector.
+	#[must_use]
 	pub fn zeros() -> Self {
 		Self::sames(0.0)
 	}
 
 	/// Create a new vector whose components are all one.
+	#[must_use]
 	pub fn ones() -> Self {
 		Self::sames(1.0)
 	}
@@ -46,6 +50,7 @@ impl Vec3f {
 	/// let v = Vec3f::new(1.0, 1.0, -1.0);
 	/// assert_eq!(u.dot(&v), 0.0);
 	/// ```
+	#[must_use]
 	pub fn dot(&self, other: &Self) -> f32 {
 		self.x * other.x + self.y * other.y + self.z * other.z
 	}
@@ -60,6 +65,7 @@ impl Vec3f {
 	/// let j = Vec3f::new(0.0, 1.0, 0.0);
 	/// let k = Vec3f::new(0.0, 0.0, 1.0);
 	/// assert_eq!(i.cross(&j), k);
+	#[must_use]
 	pub fn cross(&self, other: &Self) -> Self {
 		let x = self.y * other.z - self.z * other.y;
 		let y = self.z * other.x - self.x * other.z;
@@ -77,6 +83,8 @@ impl Vec3f {
 	/// let v = Vec3f::new(1.0, 2.0, 3.0);
 	/// assert_eq!(v.length2(), 14.0);
 	/// ```
+	#[inline]
+	#[must_use]
 	pub fn length2(&self) -> f32 {
 		self.dot(self)
 	}
@@ -90,6 +98,8 @@ impl Vec3f {
 	/// let v = Vec3f::new(1.0, 2.0, 2.0);
 	/// assert_eq!(v.length(), 3.0);
 	/// ```
+	#[inline]
+	#[must_use]
 	pub fn length(&self) -> f32 {
 		self.length2().sqrt()
 	}
@@ -149,6 +159,8 @@ impl Vec3f {
 	/// let v = u.normalized();
 	/// assert_eq!(v.length(), 1.0);
 	/// ```
+	#[inline]
+	#[must_use]
 	pub fn normalized(&self) -> Self {
 		let mut out = *self;
 		out.normalize();
@@ -156,6 +168,8 @@ impl Vec3f {
 	}
 
 	/// Return mix of x (self) and y, i.e. `(1 - k) * x + k * y`.
+	#[inline]
+	#[must_use]
 	pub fn mix(&self, y: &Vec3f, k: f32) -> Vec3f {
 		*self * (1.0 - k) + *y * k
 	}

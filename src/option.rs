@@ -10,6 +10,7 @@ pub struct RenderOpt {
 }
 
 impl RenderOpt {
+	#[must_use]
 	pub fn new(width: usize, height: usize, fov: f32, camera_to_world: Matrix44f) -> Self {
 		Self {
 			width,
@@ -20,6 +21,7 @@ impl RenderOpt {
 	}
 
 	/// Return the ratio of width to height.
+	#[must_use]
 	pub fn aspect_ratio(&self) -> f32 {
 		self.width as f32 / self.height as f32
 	}
@@ -34,6 +36,7 @@ impl RenderOpt {
 	/// option.fov = 90.0;
 	/// assert_eq!(option.angle(), 1.0);
 	/// ```
+	#[must_use]
 	pub fn angle(&self) -> f32 {
 		deg2rad(self.fov / 2.0).tan()
 	}

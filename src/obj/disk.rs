@@ -12,6 +12,7 @@ pub struct Disk {
 }
 
 impl Disk {
+	#[must_use]
 	pub fn new(center: Vec3f, normal: Vec3f, radius: f32, color: Vec3f) -> Self {
 		Self {
 			center,
@@ -51,6 +52,8 @@ impl Object for Disk {
 		let d = (*phit - self.center).length();
 		let pattern = d * scale % 1.0 > 0.5;
 
-		self.color.mix(&(self.color * 0.8), pattern as u32 as f32) * self.normal.dot(dir).abs()
+		self.color
+			.mix(&(self.color * 0.8), u32::from(pattern) as f32)
+			* self.normal.dot(dir).abs()
 	}
 }

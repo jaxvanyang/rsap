@@ -13,6 +13,7 @@ pub struct Sphere {
 }
 
 impl Sphere {
+	#[must_use]
 	pub fn new(center: Vec3f, radius: f32, color: Vec3f) -> Self {
 		assert!(radius >= 0.0);
 		Self {
@@ -52,7 +53,7 @@ impl Object for Sphere {
 		let x = nhit.z.atan2(nhit.x).abs() / PI;
 		let y = nhit.y.asin() / PI + 0.5;
 		let scale: f32 = 4.0;
-		let pattern = (((x * scale) % 1.0 > 0.5) ^ ((y * scale) % 1.0 > 0.5)) as u32 as f32;
+		let pattern = u32::from(((x * scale) % 1.0 > 0.5) ^ ((y * scale) % 1.0 > 0.5)) as f32;
 
 		self.color.mix(&(self.color * 0.8), pattern) * nhit.dot(dir).abs()
 	}

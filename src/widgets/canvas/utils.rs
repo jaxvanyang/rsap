@@ -18,6 +18,7 @@ pub fn is_zero(x: f32) -> bool {
 }
 
 #[inline]
+#[must_use]
 pub fn cartesian_to_screen(p: &Point, center: &Point) -> Point {
 	let x = center.x + p.x * UNIT;
 	let y = center.y - p.y * UNIT;
@@ -78,9 +79,7 @@ pub fn draw_function(frame: &mut canvas::Frame, expr: &Expression) {
 
 	for i in -w..w {
 		let x = i as f32 * EPS;
-		let y = if let Some(y) = expr.eval(x) {
-			y
-		} else {
+		let Some(y) = expr.eval(x) else {
 			if !points.is_empty() {
 				point_groups.push(points);
 				points = Vec::new();

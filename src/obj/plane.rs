@@ -10,6 +10,7 @@ pub struct Plane {
 }
 
 impl Plane {
+	#[must_use]
 	pub fn new(center: Vec3f, normal: Vec3f, color: Vec3f) -> Self {
 		Self {
 			center,
@@ -39,6 +40,8 @@ impl Object for Plane {
 		let y_pattern = l.y.abs() * scale % 1.0 > 0.5;
 		let pattern = (x_pattern ^ (l.x < 0.0)) ^ (y_pattern ^ (l.y < 0.0));
 
-		self.color.mix(&(self.color * 0.8), pattern as u32 as f32) * self.normal.dot(dir)
+		self.color
+			.mix(&(self.color * 0.8), u32::from(pattern) as f32)
+			* self.normal.dot(dir)
 	}
 }

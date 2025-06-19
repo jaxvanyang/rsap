@@ -168,7 +168,7 @@ impl Lexer {
 			return Some((Token::CloseParenthesis, i + 1));
 		}
 
-		Some((Token::Invalid(chars[i..(i + 1)].iter().collect()), i + 1))
+		Some((Token::Invalid(chars[i..=i].iter().collect()), i + 1))
 	}
 }
 

@@ -7,3 +7,10 @@ edition = "2021"
 anyhow = "1.0.98"
 iced = { version = "0.13.1", features = ["canvas"] }
 rand = { version = "0.9.1", features = ["small_rng"] }
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+cast_possible_truncation = "allow"
+cast_precision_loss = "allow"
+tabs_in_doc_comments = "allow"
+similar_names = "allow"

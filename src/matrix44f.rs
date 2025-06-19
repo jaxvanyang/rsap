@@ -28,6 +28,7 @@ impl Matrix44f {
 	/// );
 	/// assert_eq!(m, Matrix44f([[0.0; 4]; 4]));
 	/// ```
+	#[must_use]
 	pub fn new(
 		x00: f32,
 		x01: f32,
@@ -67,6 +68,7 @@ impl Matrix44f {
 	/// 	}
 	/// }
 	/// ```
+	#[must_use]
 	pub fn sames(x: f32) -> Self {
 		Self([[x; 4]; 4])
 	}
@@ -83,6 +85,7 @@ impl Matrix44f {
 	/// 	}
 	/// }
 	/// ```
+	#[must_use]
 	pub fn zeros() -> Self {
 		Self::sames(0.0)
 	}
@@ -138,6 +141,7 @@ impl Matrix44f {
 	/// );
 	/// assert_eq!(m.transposed(), n);
 	/// ```
+	#[must_use]
 	pub fn transposed(&self) -> Self {
 		let mut m = *self;
 		m.transpose();
@@ -159,6 +163,7 @@ impl Matrix44f {
 	/// let v = Vec3f::new(1.0, 2.0, 3.0);
 	/// assert_eq!(m.mul_vector(&v), Vec3f::new(3.0, 2.0, 1.0));
 	/// ```
+	#[must_use]
 	pub fn mul_vector(&self, vector: &Vec3f) -> Vec3f {
 		let x = self[0][0] * vector.x + self[0][1] * vector.y + self[0][2] * vector.z;
 		let y = self[1][0] * vector.x + self[1][1] * vector.y + self[1][2] * vector.z;
@@ -182,6 +187,7 @@ impl Matrix44f {
 	/// let v = Vec3f::new(1.0, 2.0, 3.0);
 	/// assert_eq!(m.mul_point(&v), Vec3f::new(4.0, 3.0, 2.0));
 	/// ```
+	#[must_use]
 	pub fn mul_point(&self, vector: &Vec3f) -> Vec3f {
 		let x = self[0][0] * vector.x + self[0][1] * vector.y + self[0][2] * vector.z + self[0][3];
 		let y = self[1][0] * vector.x + self[1][1] * vector.y + self[1][2] * vector.z + self[1][3];

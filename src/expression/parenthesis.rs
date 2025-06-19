@@ -46,7 +46,7 @@ macro_rules! paren {
 #[cfg(test)]
 mod tests {
 	use super::*;
-	use crate::{add, mul, num, var};
+	use crate::{add, mul, num};
 
 	#[test]
 	fn test_paren() {

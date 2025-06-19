@@ -7,4 +7,4 @@ run example:
 
 # Runs a clippy check
 check *args:
-    cargo clippy {{args}} -- -W clippy::pedantic
+    cargo clippy {{args}}

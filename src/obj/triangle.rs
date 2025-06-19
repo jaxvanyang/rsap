@@ -9,6 +9,7 @@ pub struct Triangle {
 }
 
 impl Triangle {
+	#[must_use]
 	pub fn new(a: Vec3f, b: Vec3f, c: Vec3f, ca: Vec3f, cb: Vec3f, cc: Vec3f) -> Self {
 		Self {
 			vertices: [a, b, c],
@@ -58,7 +59,7 @@ impl Object for Triangle {
 		Some(t)
 	}
 
-	fn shade(&self, dir: &Vec3f, phit: &Vec3f) -> Vec3f {
+	fn shade(&self, _dir: &Vec3f, phit: &Vec3f) -> Vec3f {
 		let ab = self.vertices[1] - self.vertices[0];
 		let ac = self.vertices[2] - self.vertices[0];
 		let n = ab.cross(&ac);
