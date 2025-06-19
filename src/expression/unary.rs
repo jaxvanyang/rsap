@@ -3,6 +3,12 @@ mod macros;
 
 use super::{Expression, Function};
 
+/// Unary expression.
+///
+/// ```bnf
+/// u_expr ::= u_op expression
+/// u_op ::= "-" | "+"
+/// ```
 #[derive(Debug, Clone)]
 pub enum Unary {
 	Neg(Expression),

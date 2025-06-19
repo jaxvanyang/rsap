@@ -1,9 +1,16 @@
 use super::{Expression, Function};
 
+/// Number expression.
+///
+/// ```bnf
+/// number ::= (digit)+ ["." (digit)+]
+/// digit ::= "0"..."9"
+/// ```
 #[derive(Debug, Clone)]
 pub struct Number(f32);
 
 impl Number {
+	#[must_use]
 	pub fn new(n: f32) -> Self {
 		Self(n)
 	}

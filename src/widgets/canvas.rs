@@ -52,6 +52,7 @@ impl<Message> Program<Message> for EmptyCanvas {
 }
 
 /// Create an empty canvas with background.
+#[must_use]
 pub fn empty_canvas<Message>() -> canvas::Canvas<EmptyCanvas, Message> {
 	canvas::Canvas::new(EmptyCanvas)
 }

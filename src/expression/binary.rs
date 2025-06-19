@@ -3,9 +3,10 @@ mod macros;
 
 use super::{Expression, Function};
 
-/// Binary operations.
+/// Binary expression.
 ///
 /// ```bnf
+/// bop_rhs ::= b_op primary
 /// b_op ::= "+" | "-" | "*" | "/"
 /// ```
 #[derive(Debug, Clone)]

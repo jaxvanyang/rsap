@@ -5,12 +5,21 @@ pub enum Token {
 	Invalid(String),
 	WhiteSpace(char),
 	Number(f32),
+	/// ```bnf
+	/// id ::= ("a"..."z" | "A"..."Z")+
+	/// ```
 	Identifier(String),
+	/// ```bnf
+	/// op ::= "+" | "-" | "*" | "/"
 	Operator(String),
+	OpenParenthesis,
+	CloseParenthesis,
 	Eof,
 }
 
 impl Token {
+	#[inline]
+	#[must_use]
 	pub fn is_whitespace(&self) -> bool {
 		if let Self::WhiteSpace(_) = self {
 			true
@@ -19,6 +28,8 @@ impl Token {
 		}
 	}
 
+	#[inline]
+	#[must_use]
 	pub fn is_eof(&self) -> bool {
 		if let Self::Eof = self {
 			true
@@ -27,8 +38,30 @@ impl Token {
 		}
 	}
 
+	#[inline]
+	#[must_use]
 	pub fn is_operator(&self) -> bool {
 		if let Self::Operator(_) = self {
+			true
+		} else {
+			false
+		}
+	}
+
+	#[inline]
+	#[must_use]
+	pub fn is_open_parenthesis(&self) -> bool {
+		if let Self::OpenParenthesis = self {
+			true
+		} else {
+			false
+		}
+	}
+
+	#[inline]
+	#[must_use]
+	pub fn is_close_parenthesis(&self) -> bool {
+		if let Self::CloseParenthesis = self {
 			true
 		} else {
 			false
@@ -72,14 +105,18 @@ impl Lexer {
 	#[inline]
 	fn get_token(&self, i: usize) -> Option<(Token, usize)> {
 		let chars = &self.chars;
+
+		// only consider run-out as EOF
 		if i >= chars.len() {
 			return None;
 		}
 
+		// check white space
 		if chars[i].is_whitespace() {
 			return Some((Token::WhiteSpace(chars[i]), i + 1));
 		}
 
+		// check number
 		if chars[i].is_ascii_digit() {
 			let mut j = i + 1;
 			while chars.get(j).is_some_and(char::is_ascii_digit) {
@@ -104,6 +141,7 @@ impl Lexer {
 			return Some((Token::Number(c), j));
 		}
 
+		// check identifier
 		if chars[i].is_ascii_alphabetic() {
 			let mut j = i + 1;
 			while chars.get(j).is_some_and(char::is_ascii_alphabetic) {
@@ -113,12 +151,21 @@ impl Lexer {
 			return Some((Token::Identifier(chars[i..j].iter().collect()), j));
 		}
 
+		// check operator
 		for op in OPERATORS {
 			// max length of operators is 2
 			let s: String = chars[i..(chars.len().min(i + 2))].iter().collect();
 			if s.starts_with(op) {
 				return Some((Token::Operator(op.to_string()), i + op.len()));
 			}
+		}
+
+		// check parenthesis
+		if chars[i] == '(' {
+			return Some((Token::OpenParenthesis, i + 1));
+		}
+		if chars[i] == ')' {
+			return Some((Token::CloseParenthesis, i + 1));
 		}
 
 		Some((Token::Invalid(chars[i..(i + 1)].iter().collect()), i + 1))
@@ -155,7 +202,7 @@ mod tests {
 
 	#[test]
 	fn test_tokenize() {
-		let tokens: Vec<_> = Lexer::new("-x + 1 - 2 * 3 / 4").collect();
+		let tokens: Vec<_> = Lexer::new("-x + (1 - 2) * 3 / 4").collect();
 		assert_eq!(
 			tokens,
 			[
@@ -164,11 +211,13 @@ mod tests {
 				Token::WhiteSpace(' '),
 				Token::Operator("+".to_string()),
 				Token::WhiteSpace(' '),
+				Token::OpenParenthesis,
 				Token::Number(1.0),
 				Token::WhiteSpace(' '),
 				Token::Operator("-".to_string()),
 				Token::WhiteSpace(' '),
 				Token::Number(2.0),
+				Token::CloseParenthesis,
 				Token::WhiteSpace(' '),
 				Token::Operator("*".to_string()),
 				Token::WhiteSpace(' '),

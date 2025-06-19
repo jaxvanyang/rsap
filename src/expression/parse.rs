@@ -1,4 +1,4 @@
-use crate::{binary_expr, neg, num, var};
+use crate::{binary_expr, neg, num, paren, var};
 
 use super::{
 	lexer::{Lexer, Token},
@@ -35,8 +35,13 @@ impl Parser {
 			self.get_next();
 		}
 	}
-
-	fn parse_number(&mut self) -> anyhow::Result<Expression> {
+	/// Parse umber expression.
+	///
+	/// ```bnf
+	/// number ::= (digit)+ ["." (digit)+]
+	/// digit ::= "0"..."9"
+	/// ```
+	fn parse_number(&mut self) -> Expression {
 		let expr = if let Token::Number(n) = self.current {
 			num!(n).into()
 		} else {
@@ -45,9 +50,14 @@ impl Parser {
 
 		self.get_next();
 
-		Ok(expr)
+		expr
 	}
 
+	/// Parse variable expression, i.e., x.
+	///
+	/// ```bnf
+	/// variable ::= "x"
+	/// ```
 	fn parse_variable(&mut self) -> anyhow::Result<Expression> {
 		let expr = if let Token::Identifier(id) = &self.current {
 			if id == "x" {
@@ -64,6 +74,12 @@ impl Parser {
 		Ok(expr)
 	}
 
+	/// Parse unary expression.
+	///
+	/// ```bnf
+	/// u_expr ::= u_op expression
+	/// u_op ::= "-" | "+"
+	/// ```
 	fn parse_unary(&mut self) -> anyhow::Result<Expression> {
 		if let Token::Operator(op) = &self.current {
 			if op == "-" {
@@ -76,11 +92,39 @@ impl Parser {
 		unreachable!()
 	}
 
+	/// Parse parenthesis expression.
+	///
+	/// ```bnf
+	/// p_expr ::= "(" expression ")"
+	/// ```
+	fn parse_parenthesis(&mut self) -> anyhow::Result<Expression> {
+		assert!(self.current.is_open_parenthesis());
+
+		// eat "("
+		self.get_next();
+
+		let expr = self.parse_sub()?;
+
+		if !self.current.is_close_parenthesis() {
+			anyhow::bail!("expected `)`, but found: {:?}", self.current);
+		}
+
+		self.get_next();
+
+		Ok(paren!(expr).into())
+	}
+
+	/// Parse primary expression.
+	///
+	/// ```bnf
+	/// primary ::= number | variable | u_expr | p_expr
+	/// ```
 	fn parse_primary(&mut self) -> anyhow::Result<Expression> {
 		match self.current {
-			Token::Number(_) => self.parse_number(),
+			Token::Number(_) => Ok(self.parse_number()),
 			Token::Identifier(_) => self.parse_variable(),
 			Token::Operator(_) => self.parse_unary(),
+			Token::OpenParenthesis => self.parse_parenthesis(),
 			_ => anyhow::bail!("not expected: {:?}", self.current),
 		}
 	}
@@ -88,7 +132,9 @@ impl Parser {
 	/// Parse sub-expression (including empty) with equal or highter precedence than `lhs`.
 	///
 	/// ```bnf
-	/// op_rhs ::= (op primary)*
+	/// b_subexpr ::= (bop_rhs)*
+	/// bop_rhs ::= b_op primary
+	/// b_op ::= "+" | "-" | "*" | "/"
 	/// ```
 	fn parse_op_rhs(
 		&mut self,
@@ -97,7 +143,6 @@ impl Parser {
 	) -> anyhow::Result<Expression> {
 		loop {
 			match &self.current {
-				Token::Eof => return Ok(lhs),
 				Token::Operator(op) => {
 					let op = op.clone();
 					let token_precedence = self.current.precedence().unwrap();
@@ -123,15 +168,35 @@ impl Parser {
 
 					lhs = binary_expr!(&op, lhs, rhs).unwrap().into();
 				}
-				_ => anyhow::bail!("expected EOF or an operator, but found: {:?}", self.current),
+				_ => return Ok(lhs),
 			}
 		}
 	}
 
-	pub fn parse(&mut self) -> anyhow::Result<Expression> {
+	/// Parse sub-expression.
+	///
+	/// ```bnf
+	/// sub_expr ::= primary b_subexpr
+	/// ```
+	pub fn parse_sub(&mut self) -> anyhow::Result<Expression> {
 		let lhs = self.parse_primary()?;
 
 		self.parse_op_rhs(lhs, 0)
+	}
+
+	/// Parse top-level expression.
+	///
+	/// ```bnf
+	/// expression ::= sub_expr eof
+	/// ```
+	pub fn parse(&mut self) -> anyhow::Result<Expression> {
+		let result = self.parse_sub();
+
+		if !self.current.is_eof() {
+			anyhow::bail!("expected EOF, but found: {:?}", self.current);
+		}
+
+		result
 	}
 }
 
@@ -216,5 +281,13 @@ mod tests {
 		let f = parse!(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(1.0).unwrap(), 2.0);
+	}
+
+	#[test]
+	fn test_parse_paren() {
+		let expr = "(x + 1) * 2";
+		let f = parse!(expr).unwrap();
+		assert_eq!(f.to_string(), expr);
+		assert_eq!(f.eval(1.0).unwrap(), 4.0);
 	}
 }

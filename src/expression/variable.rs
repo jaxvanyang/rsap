@@ -1,9 +1,15 @@
 use super::{Expression, Function};
 
+/// Variable expression, i.e., x.
+///
+/// ```bnf
+/// variable ::= "x"
+/// ```
 #[derive(Debug, Clone, Default)]
 pub struct Variable;
 
 impl Variable {
+	#[must_use]
 	pub fn new() -> Self {
 		Self
 	}
