@@ -1,6 +1,7 @@
 //! Function expression.
 
 pub mod binary;
+pub mod constant;
 pub mod func;
 pub mod lexer;
 pub mod number;
@@ -11,6 +12,7 @@ pub mod unary;
 pub mod variable;
 
 pub use binary::*;
+pub use constant::*;
 pub use func::*;
 pub use lexer::*;
 pub use number::*;
@@ -24,6 +26,7 @@ pub use variable::*;
 #[derive(Debug, Clone)]
 pub enum Expression {
 	Number(Number),
+	Constant(Constant),
 	Variable(Variable),
 	Unary(Box<Unary>),
 	Parenthesis(Box<Parenthesis>),
@@ -36,6 +39,7 @@ impl std::fmt::Display for Expression {
 		match self {
 			Expression::Number(number) => number.fmt(f),
 			Expression::Variable(variable) => variable.fmt(f),
+			Expression::Constant(c) => c.fmt(f),
 			Expression::Unary(unary) => unary.fmt(f),
 			Expression::Parenthesis(parenthesis) => parenthesis.fmt(f),
 			Expression::Binary(binary) => binary.fmt(f),
@@ -47,12 +51,11 @@ impl std::fmt::Display for Expression {
 impl Function for Expression {
 	fn is_x_valid(&self, x: f32) -> bool {
 		match self {
-			Expression::Number(number) => number.is_x_valid(x),
-			Expression::Variable(variable) => variable.is_x_valid(x),
 			Expression::Unary(unary) => unary.is_x_valid(x),
 			Expression::Parenthesis(parenthesis) => parenthesis.is_x_valid(x),
 			Expression::Binary(binary) => binary.is_x_valid(x),
 			Expression::Func(func) => func.is_x_valid(x),
+			_ => true,
 		}
 	}
 
@@ -60,6 +63,7 @@ impl Function for Expression {
 		match self {
 			Expression::Number(number) => number.eval(x),
 			Expression::Variable(variable) => variable.eval(x),
+			Expression::Constant(c) => c.eval(x),
 			Expression::Unary(unary) => unary.eval(x),
 			Expression::Parenthesis(parenthesis) => parenthesis.eval(x),
 			Expression::Binary(binary) => binary.eval(x),

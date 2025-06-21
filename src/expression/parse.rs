@@ -1,4 +1,4 @@
-use crate::{binary_expr, func, neg, num, paren, var};
+use crate::{binary_expr, constant, func, neg, num, paren, var};
 
 use super::{
 	lexer::{Lexer, Token},
@@ -13,12 +13,13 @@ pub struct Parser {
 
 impl Parser {
 	pub fn new<T: ToString>(expr: T) -> Self {
-		let mut lexer = Lexer::new(expr);
+		let mut out = Self {
+			current: Token::Eof,
+			lexer: Lexer::new(expr),
+		};
+		out.get_next();
 
-		Self {
-			current: lexer.next().unwrap_or(Token::Eof),
-			lexer,
-		}
+		out
 	}
 
 	/// Update current token to the next non-whitespace token by lexer.
@@ -65,6 +66,21 @@ impl Parser {
 		self.get_next();
 
 		x
+	}
+
+	/// Parse constant expression.
+	///
+	/// ```bnf
+	/// constant ::= "e" | "pi"
+	/// ```
+	fn parse_constant(&mut self) -> Expression {
+		let Token::Identifier(c) = self.current.clone() else {
+			unreachable!()
+		};
+
+		self.get_next();
+
+		constant!(c).unwrap().into()
 	}
 
 	/// Parse unary expression.
@@ -149,13 +165,14 @@ impl Parser {
 	/// Parse primary expression.
 	///
 	/// ```bnf
-	/// primary ::= number | variable | u_expr | p_expr | f_expr
+	/// primary ::= number | variable | constant | u_expr | p_expr | f_expr
 	/// ```
 	fn parse_primary(&mut self) -> anyhow::Result<Expression> {
 		match &self.current {
 			Token::Number(_) => Ok(self.parse_number()),
 			Token::Identifier(id) => match id.as_str() {
 				"x" => Ok(self.parse_variable()),
+				"e" | "pi" => Ok(self.parse_constant()),
 				_ => self.parse_function(),
 			},
 			Token::Operator(_) => self.parse_unary(),
@@ -256,8 +273,12 @@ mod tests {
 
 	#[test]
 	fn test_parser() {
-		let parser = Parser::new("-x + 1 * 2");
-		assert_ne!(parser.current, Token::Eof);
+		let mut parser = Parser::new(" -x + 1 * 2");
+		assert_eq!(parser.current, Token::Operator("-".to_string()));
+		parser.get_next();
+		assert_eq!(parser.current, Token::Identifier("x".to_string()));
+		parser.get_next();
+		assert_eq!(parser.current, Token::Operator("+".to_string()));
 	}
 
 	#[test]
@@ -295,6 +316,17 @@ mod tests {
 		assert_eq!(parse!(expr).unwrap().to_string(), expr);
 
 		assert!(parse!("y").is_err());
+	}
+
+	#[test]
+	fn test_parse_constant() {
+		let expr = "e";
+		assert_eq!(parse!(expr).unwrap().to_string(), expr);
+
+		let expr = "pi";
+		assert_eq!(parse!(expr).unwrap().to_string(), expr);
+
+		assert!(parse!("C").is_err());
 	}
 
 	#[test]
