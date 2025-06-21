@@ -432,5 +432,10 @@ mod tests {
 		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert!(f.eval(0.0).is_none());
+
+		let expr = "sqrt(x)";
+		let f = parse(expr).unwrap();
+		assert_eq!(f.to_string(), expr);
+		assert_eq!(f.eval(0.0).unwrap(), 0.0);
 	}
 }

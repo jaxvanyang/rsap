@@ -81,3 +81,10 @@ macro_rules! ln {
 		$crate::func!("ln", $e).unwrap()
 	};
 }
+
+#[macro_export]
+macro_rules! sqrt {
+	($e:expr) => {
+		$crate::func!("sqrt", $e).unwrap()
+	};
+}
