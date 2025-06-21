@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! func {
-	($op:expr, $e:expr) => {
-		$crate::expression::Func::new($op, $e)
+	($f_name:expr, $e:expr) => {
+		$crate::expression::Func::new($f_name, $e)
 	};
 }
 

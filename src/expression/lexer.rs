@@ -3,7 +3,6 @@ pub const OPERATORS: [&str; 5] = ["**", "+", "-", "*", "/"];
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
-	Invalid(String),
 	WhiteSpace(char),
 	Number(f32),
 	/// ```bnf
@@ -16,6 +15,8 @@ pub enum Token {
 	OpenParenthesis,
 	CloseParenthesis,
 	Eof,
+	/// Invalid sub-string or other character.
+	Other(String),
 }
 
 impl Token {
@@ -64,6 +65,16 @@ impl Token {
 	pub fn is_close_parenthesis(&self) -> bool {
 		if let Self::CloseParenthesis = self {
 			true
+		} else {
+			false
+		}
+	}
+
+	#[inline]
+	#[must_use]
+	pub fn is_comma(&self) -> bool {
+		if let Self::Other(s) = self {
+			s == ","
 		} else {
 			false
 		}
@@ -129,7 +140,7 @@ impl Lexer {
 				j += 1;
 
 				if !chars.get(j).is_some_and(char::is_ascii_digit) {
-					return Some((Token::Invalid(chars[i..j].iter().collect()), j));
+					return Some((Token::Other(chars[i..j].iter().collect()), j));
 				}
 
 				while chars.get(j).is_some_and(char::is_ascii_digit) {
@@ -170,7 +181,7 @@ impl Lexer {
 			return Some((Token::CloseParenthesis, i + 1));
 		}
 
-		Some((Token::Invalid(chars[i..=i].iter().collect()), i + 1))
+		Some((Token::Other(chars[i..=i].iter().collect()), i + 1))
 	}
 }
 

@@ -1,21 +1,12 @@
-use super::{EPS, UNIT};
-use crate::expression::{Expression, Function};
+use super::UNIT;
+use crate::{
+	consts::EPS,
+	expression::{Expression, Function},
+};
 use iced::{
 	widget::canvas::{self, Stroke},
 	Color, Point,
 };
-
-#[inline]
-#[must_use]
-pub fn is_equal(a: f32, b: f32) -> bool {
-	(a - b).abs() < EPS
-}
-
-#[inline]
-#[must_use]
-pub fn is_zero(x: f32) -> bool {
-	is_equal(x, 0.0)
-}
 
 #[inline]
 #[must_use]

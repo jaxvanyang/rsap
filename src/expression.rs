@@ -3,6 +3,7 @@
 pub mod binary;
 pub mod constant;
 pub mod func;
+pub mod func2;
 pub mod lexer;
 pub mod number;
 pub mod parenthesis;
@@ -13,7 +14,8 @@ pub mod variable;
 
 pub use binary::*;
 pub use constant::*;
-pub use func::*;
+pub use func::Func;
+pub use func2::Func2;
 pub use lexer::*;
 pub use number::*;
 pub use parenthesis::*;
@@ -32,6 +34,7 @@ pub enum Expression {
 	Parenthesis(Box<Parenthesis>),
 	Binary(Box<Binary>),
 	Func(Box<Func>),
+	Func2(Box<Func2>),
 }
 
 impl std::fmt::Display for Expression {
@@ -44,6 +47,7 @@ impl std::fmt::Display for Expression {
 			Expression::Parenthesis(parenthesis) => parenthesis.fmt(f),
 			Expression::Binary(binary) => binary.fmt(f),
 			Expression::Func(func) => func.fmt(f),
+			Expression::Func2(func) => func.fmt(f),
 		}
 	}
 }
@@ -54,7 +58,8 @@ impl Function for Expression {
 			Expression::Unary(unary) => unary.is_x_valid(x),
 			Expression::Parenthesis(parenthesis) => parenthesis.is_x_valid(x),
 			Expression::Binary(binary) => binary.is_x_valid(x),
-			Expression::Func(func) => func.is_x_valid(x),
+			Expression::Func(f) => f.is_x_valid(x),
+			Expression::Func2(f) => f.is_x_valid(x),
 			_ => true,
 		}
 	}
@@ -67,7 +72,8 @@ impl Function for Expression {
 			Expression::Unary(unary) => unary.eval(x),
 			Expression::Parenthesis(parenthesis) => parenthesis.eval(x),
 			Expression::Binary(binary) => binary.eval(x),
-			Expression::Func(func) => func.eval(x),
+			Expression::Func(f) => f.eval(x),
+			Expression::Func2(f) => f.eval(x),
 		}
 	}
 }

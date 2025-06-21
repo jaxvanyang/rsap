@@ -1,8 +1,9 @@
-use crate::{binary_expr, constant, func, neg, num, paren, var};
+use crate::{binary_expr, constant, func, func2, neg, num, paren, var};
 
 use super::{
+	func, func2,
 	lexer::{Lexer, Token},
-	Expression, FUNCTION_NAMES,
+	Expression,
 };
 
 #[derive(Debug, Clone)]
@@ -36,6 +37,7 @@ impl Parser {
 			self.get_next();
 		}
 	}
+
 	/// Parse umber expression.
 	///
 	/// ```bnf
@@ -125,20 +127,14 @@ impl Parser {
 	/// Parse function expression.
 	///
 	/// ```bnf
-	/// f_expr ::= f_name "(" sub_expr ")"
-	/// f_name ::= "sin"
+	/// f_expr ::= func | func2
+	/// func ::= func_name "(" sub_expr ")"
+	/// func2 ::= func2_name "(" sub_expr "," sub_expr ")"
 	/// ```
 	fn parse_function(&mut self) -> anyhow::Result<Expression> {
 		let Token::Identifier(f_name) = self.current.clone() else {
 			anyhow::bail!("expected a function name, but found: {:?}", self.current);
 		};
-
-		if !FUNCTION_NAMES.contains(&f_name.as_str()) {
-			anyhow::bail!(
-				"expected a valid function name, but found: {:?}",
-				self.current
-			);
-		}
 
 		// eat f_name
 		self.get_next();
@@ -150,16 +146,44 @@ impl Parser {
 		// eat "("
 		self.get_next();
 
-		let expr = self.parse_sub()?;
+		// parse single-argument functions
+		if func::FUNCTION_NAMES.contains(&f_name.as_str()) {
+			let expr = self.parse_sub()?;
 
-		if !self.current.is_close_parenthesis() {
-			anyhow::bail!("expected `)`, but found: {:?}", self.current);
+			if !self.current.is_close_parenthesis() {
+				anyhow::bail!("expected `)`, but found: {:?}", self.current);
+			}
+
+			// eat ")"
+			self.get_next();
+
+			Ok(func!(f_name, expr).unwrap().into())
+		} else if func2::FUNCTION_NAMES.contains(&f_name.as_str()) {
+			let lhs = self.parse_sub()?;
+
+			if !self.current.is_comma() {
+				anyhow::bail!("expected `,`, but found: {:?}", self.current);
+			}
+
+			// eat ","
+			self.get_next();
+
+			let rhs = self.parse_sub()?;
+
+			if !self.current.is_close_parenthesis() {
+				anyhow::bail!("expected `)`, but found: {:?}", self.current);
+			}
+
+			// eat ")"
+			self.get_next();
+
+			Ok(func2!(f_name, lhs, rhs).unwrap().into())
+		} else {
+			anyhow::bail!(
+				"expected a valid function name, but found: {:?}",
+				self.current
+			);
 		}
-
-		// eat ")"
-		self.get_next();
-
-		Ok(func!(f_name, expr).unwrap().into())
 	}
 
 	/// Parse primary expression.
@@ -377,7 +401,7 @@ mod tests {
 	}
 
 	#[test]
-	fn test_parse_func() {
+	fn test_parse_function() {
 		let expr = "sin(x)";
 		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
@@ -437,5 +461,10 @@ mod tests {
 		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(0.0).unwrap(), 0.0);
+
+		let expr = "log(10, x)";
+		let f = parse(expr).unwrap();
+		assert_eq!(f.to_string(), expr);
+		assert!(f.eval(0.0).is_none());
 	}
 }

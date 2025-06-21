@@ -1,3 +1,5 @@
+//! Single-argument functions.
+
 #[macro_use]
 mod macros;
 
