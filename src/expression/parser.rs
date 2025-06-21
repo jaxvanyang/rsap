@@ -252,11 +252,9 @@ impl Parser {
 	}
 }
 
-#[macro_export]
-macro_rules! parse {
-	($e:expr) => {
-		$crate::expression::Parser::new($e).parse()
-	};
+#[inline]
+pub fn parse<T: ToString>(expr: T) -> anyhow::Result<Expression> {
+	Parser::new(expr).parse()
 }
 
 #[cfg(test)]
@@ -265,7 +263,7 @@ mod tests {
 
 	#[test]
 	fn test_parse() {
-		let f = parse!("-x + 1 * 2").unwrap();
+		let f = parse("-x + 1 * 2").unwrap();
 		assert_eq!(f.to_string(), "-x + 1 * 2");
 		assert_eq!(f.eval(0.0).unwrap(), 2.0);
 		assert_eq!(f.eval(1.0).unwrap(), 1.0);
@@ -283,15 +281,15 @@ mod tests {
 
 	#[test]
 	fn test_parse_primary() {
-		let f = parse!("1").unwrap();
+		let f = parse("1").unwrap();
 		assert_eq!(f.eval(0.0).unwrap(), 1.0);
 		assert_eq!(f.eval(1.0).unwrap(), 1.0);
 
-		let f = parse!("x").unwrap();
+		let f = parse("x").unwrap();
 		assert_eq!(f.eval(0.0).unwrap(), 0.0);
 		assert_eq!(f.eval(1.0).unwrap(), 1.0);
 
-		let f = parse!("-x").unwrap();
+		let f = parse("-x").unwrap();
 		assert_eq!(f.eval(0.0).unwrap(), 0.0);
 		assert_eq!(f.eval(1.0).unwrap(), -1.0);
 	}
@@ -299,45 +297,45 @@ mod tests {
 	#[test]
 	fn test_parse_number() {
 		let expr = "1";
-		assert_eq!(parse!(expr).unwrap().to_string(), expr);
+		assert_eq!(parse(expr).unwrap().to_string(), expr);
 
 		let expr = "1.0";
-		assert_eq!(parse!(expr).unwrap().to_string(), "1");
+		assert_eq!(parse(expr).unwrap().to_string(), "1");
 
 		let expr = "0.3";
-		assert_eq!(parse!(expr).unwrap().to_string(), expr);
+		assert_eq!(parse(expr).unwrap().to_string(), expr);
 
-		assert!(parse!("1.").is_err());
+		assert!(parse("1.").is_err());
 	}
 
 	#[test]
 	fn test_parse_variable() {
 		let expr = "x";
-		assert_eq!(parse!(expr).unwrap().to_string(), expr);
+		assert_eq!(parse(expr).unwrap().to_string(), expr);
 
-		assert!(parse!("y").is_err());
+		assert!(parse("y").is_err());
 	}
 
 	#[test]
 	fn test_parse_constant() {
 		let expr = "e";
-		assert_eq!(parse!(expr).unwrap().to_string(), expr);
+		assert_eq!(parse(expr).unwrap().to_string(), expr);
 
 		let expr = "pi";
-		assert_eq!(parse!(expr).unwrap().to_string(), expr);
+		assert_eq!(parse(expr).unwrap().to_string(), expr);
 
-		assert!(parse!("C").is_err());
+		assert!(parse("C").is_err());
 	}
 
 	#[test]
 	fn test_parse_neg() {
 		let expr = "-x";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(1.0).unwrap(), -1.0);
 
 		let expr = "--x";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(1.0).unwrap(), 1.0);
 	}
@@ -345,27 +343,27 @@ mod tests {
 	#[test]
 	fn test_parse_binary() {
 		let expr = "x + x";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(1.0).unwrap(), 2.0);
 
 		let expr = "x - x";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(1.0).unwrap(), 0.0);
 
 		let expr = "x * x";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(1.0).unwrap(), 1.0);
 
 		let expr = "x / x";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(1.0).unwrap(), 1.0);
 
 		let expr = "x ** x";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(1.0).unwrap(), 1.0);
 	}
@@ -373,7 +371,7 @@ mod tests {
 	#[test]
 	fn test_parse_paren() {
 		let expr = "(x + 1) * 2";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(1.0).unwrap(), 4.0);
 	}
@@ -381,57 +379,57 @@ mod tests {
 	#[test]
 	fn test_parse_func() {
 		let expr = "sin(x)";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(0.0).unwrap(), 0.0);
 
 		let expr = "cos(x)";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(0.0).unwrap(), 1.0);
 
 		let expr = "tan(x)";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(0.0).unwrap(), 0.0);
 
 		let expr = "cot(x)";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert!(f.eval(0.0).is_none());
 
 		let expr = "sec(x)";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(0.0).unwrap(), 1.0);
 
 		let expr = "csc(x)";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert!(f.eval(0.0).is_none());
 
 		let expr = "arcsin(x)";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(0.0).unwrap(), 0.0);
 
 		let expr = "arccos(x)";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(0.0).unwrap(), std::f32::consts::FRAC_PI_2);
 
 		let expr = "arctan(x)";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(0.0).unwrap(), 0.0);
 
 		let expr = "arccot(x)";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert_eq!(f.eval(0.0).unwrap(), std::f32::consts::FRAC_PI_2);
 
 		let expr = "ln(x)";
-		let f = parse!(expr).unwrap();
+		let f = parse(expr).unwrap();
 		assert_eq!(f.to_string(), expr);
 		assert!(f.eval(0.0).is_none());
 	}

@@ -8,14 +8,14 @@ use iced::{
 	Length::{self, Fill},
 };
 pub use message::*;
-use rsap::{parse, widgets::empty_canvas};
+use rsap::{expression::parse, widgets::empty_canvas};
 pub use state::*;
 
 pub fn update(state: &mut State, message: Message) {
 	match message {
 		Message::InputChanged(input) => {
 			// TODO: show error icon in input
-			state.expression = parse!(&input).ok();
+			state.expression = parse(&input).ok();
 
 			state.input = input;
 		}
