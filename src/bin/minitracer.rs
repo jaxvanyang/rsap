@@ -4,7 +4,7 @@
 
 use rand::prelude::*;
 use rand::rngs::SmallRng;
-use rsap::{AABB, Disk, Image, Matrix44f, Object, Plane, RenderOpt, Sphere, Triangle, Vec3f};
+use rsap::{Disk, Image, Matrix44f, Object, Plane, RenderOpt, Sphere, Triangle, Vec3f, AABB};
 use std::env;
 use std::f32;
 use std::f32::consts::FRAC_1_SQRT_2;
