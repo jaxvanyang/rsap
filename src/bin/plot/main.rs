@@ -1,6 +1,6 @@
 mod core;
 
-use core::*;
+use core::{update, view, State};
 use iced::Theme;
 
 fn main() -> iced::Result {

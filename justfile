@@ -1,9 +1,9 @@
 build:
 	cargo build --release
 
-# Run a specific example
-run example:
-	cargo run --release --example {{example}}
+# Run a specific app
+run app:
+	cargo run --release --bin {{app}}
 
 # Runs a clippy check
 check *args:

@@ -4,7 +4,7 @@
 
 use rand::prelude::*;
 use rand::rngs::SmallRng;
-use rsap::*;
+use rsap::{AABB, Disk, Image, Matrix44f, Object, Plane, RenderOpt, Sphere, Triangle, Vec3f};
 use std::env;
 use std::f32;
 use std::f32::consts::FRAC_1_SQRT_2;
@@ -119,7 +119,7 @@ fn main() {
 	let image = render(&option, &objects);
 
 	let outfile = Path::new(&outfile);
-	let mut outfile = File::create(&outfile).unwrap();
+	let mut outfile = File::create(outfile).unwrap();
 
 	outfile.write_all(&image.to_ppm()).unwrap();
 }
@@ -141,7 +141,7 @@ fn render(option: &RenderOpt, objects: &Vec<Box<dyn Object>>) -> Image {
 				.mul_vector(&Vec3f::new(x, y, -1.0))
 				.normalized();
 
-			image[i * option.width + j] = cast_ray(&orig, &dir, &objects);
+			image[i * option.width + j] = cast_ray(&orig, &dir, objects);
 		}
 	}
 
