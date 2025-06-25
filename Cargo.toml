@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.98"
-iced = { version = "0.13.1", features = ["canvas"] }
+iced = { git = "https://github.com/iced-rs/iced.git", features = ["canvas"] }
 rand = { version = "0.9.1", features = ["small_rng"] }
 
 [lints.clippy]

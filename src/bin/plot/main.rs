@@ -4,10 +4,15 @@ use core::{update, view, State};
 use iced::Theme;
 
 fn main() -> iced::Result {
-	iced::application("Plot", update, view)
-		.theme(theme)
-		.antialiasing(true)
-		.run_with(|| (State::default(), iced::widget::text_input::focus("input")))
+	iced::application(
+		|| (State::default(), iced::widget::text_input::focus("input")),
+		update,
+		view,
+	)
+	.theme(theme)
+	.antialiasing(true)
+	.title("Plot")
+	.run()
 }
 
 fn theme(_state: &State) -> Theme {
