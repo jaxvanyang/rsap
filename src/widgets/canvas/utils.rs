@@ -1,5 +1,6 @@
-use super::UNIT;
+use super::{LINE_WIDTH, UNIT};
 use crate::{
+	color::iced::{BLUE, GRAY, LIGHT_GRAY},
 	consts::EPS,
 	expression::{Expression, Function},
 };
@@ -18,10 +19,21 @@ pub fn cartesian_to_screen(p: &Point, center: &Point) -> Point {
 
 /// Draw background on the canvas frame.
 pub fn draw_background(frame: &mut canvas::Frame) {
+	let axis_stroke = Stroke::default()
+		.with_color(LIGHT_GRAY)
+		.with_width(LINE_WIDTH);
+
 	let center = frame.center();
 	frame.fill_rectangle(Point::ORIGIN, frame.size(), Color::BLACK);
 	let w = (frame.width() / UNIT / 2.0) as i32;
 	let h = (frame.height() / UNIT / 2.0) as i32;
+	for i in -w..=w {
+		for j in -h..=h {
+			let x = center.x + i as f32 * UNIT;
+			let y = center.y + j as f32 * UNIT;
+			frame.fill(&canvas::Path::circle(Point { x, y }, 1.0), GRAY);
+		}
+	}
 	frame.stroke(
 		&canvas::Path::line(
 			Point {
@@ -33,7 +45,7 @@ pub fn draw_background(frame: &mut canvas::Frame) {
 				y: center.y,
 			},
 		),
-		Stroke::default().with_color(Color::from_rgb8(50, 50, 50)),
+		axis_stroke,
 	);
 	frame.stroke(
 		&canvas::Path::line(
@@ -46,22 +58,14 @@ pub fn draw_background(frame: &mut canvas::Frame) {
 				y: frame.height(),
 			},
 		),
-		Stroke::default().with_color(Color::from_rgb8(50, 50, 50)),
+		axis_stroke,
 	);
-	for i in -w..=w {
-		for j in -h..=h {
-			let x = center.x + i as f32 * UNIT;
-			let y = center.y + j as f32 * UNIT;
-			frame.fill(
-				&canvas::Path::circle(Point { x, y }, 1.0),
-				Color::from_rgb8(100, 100, 100),
-			);
-		}
-	}
 }
 
 /// Draw the function on the canvas frame.
 pub fn draw_function(frame: &mut canvas::Frame, expr: &Expression) {
+	let line_stroke = Stroke::default().with_width(LINE_WIDTH).with_color(BLUE);
+
 	let center = frame.center();
 	// half width in epsilons
 	let w = (((frame.width() / UNIT / 2.0) as i32 + 1) as f32 / EPS) as i32;
@@ -91,10 +95,7 @@ pub fn draw_function(frame: &mut canvas::Frame, expr: &Expression) {
 				p.line_to(point);
 			}
 		});
-		frame.stroke(
-			&path,
-			Stroke::default().with_color(Color::from_rgb8(20, 200, 240)),
-		);
+		frame.stroke(&path, line_stroke);
 	}
 }
 
