@@ -1,4 +1,4 @@
-use crate::{binary_expr, constant, func, func2, neg, num, paren, var};
+use crate::{binary_expr, constant, factorial, func, func2, neg, num, paren, var};
 
 use super::{
 	func, func2,
@@ -36,24 +36,6 @@ impl Parser {
 		if self.current.is_whitespace() {
 			self.get_next();
 		}
-	}
-
-	/// Parse umber expression.
-	///
-	/// ```bnf
-	/// number ::= (digit)+ ["." (digit)+]
-	/// digit ::= "0"..."9"
-	/// ```
-	fn parse_number(&mut self) -> Expression {
-		let expr = if let Token::Number(n) = self.current {
-			num!(n).into()
-		} else {
-			unreachable!()
-		};
-
-		self.get_next();
-
-		expr
 	}
 
 	/// Parse variable expression, i.e., x.
@@ -189,11 +171,18 @@ impl Parser {
 	/// Parse primary expression.
 	///
 	/// ```bnf
-	/// primary ::= number | variable | constant | u_expr | p_expr | f_expr
+	/// primary ::= number | factorial | variable | constant | u_expr | p_expr | f_expr
 	/// ```
 	fn parse_primary(&mut self) -> anyhow::Result<Expression> {
-		match &self.current {
-			Token::Number(_) => Ok(self.parse_number()),
+		match self.current.clone() {
+			Token::Number(n) => Ok({
+				self.get_next();
+				num!(n).into()
+			}),
+			Token::Factorial(n) => Ok({
+				self.get_next();
+				factorial!(n).into()
+			}),
 			Token::Identifier(id) => match id.as_str() {
 				"x" => Ok(self.parse_variable()),
 				"e" | "pi" => Ok(self.parse_constant()),
@@ -305,17 +294,21 @@ mod tests {
 
 	#[test]
 	fn test_parse_primary() {
-		let f = parse("1").unwrap();
-		assert_eq!(f.eval(0.0).unwrap(), 1.0);
-		assert_eq!(f.eval(1.0).unwrap(), 1.0);
+		let expr = parse("1").unwrap();
+		assert_eq!(expr.eval(0.0).unwrap(), 1.0);
+		assert_eq!(expr.eval(1.0).unwrap(), 1.0);
 
-		let f = parse("x").unwrap();
-		assert_eq!(f.eval(0.0).unwrap(), 0.0);
-		assert_eq!(f.eval(1.0).unwrap(), 1.0);
+		let expr = parse("5!").unwrap();
+		assert_eq!(expr.eval(0.0).unwrap(), 120.0);
+		assert_eq!(expr.eval(1.0).unwrap(), 120.0);
 
-		let f = parse("-x").unwrap();
-		assert_eq!(f.eval(0.0).unwrap(), 0.0);
-		assert_eq!(f.eval(1.0).unwrap(), -1.0);
+		let expr = parse("x").unwrap();
+		assert_eq!(expr.eval(0.0).unwrap(), 0.0);
+		assert_eq!(expr.eval(1.0).unwrap(), 1.0);
+
+		let expr = parse("-x").unwrap();
+		assert_eq!(expr.eval(0.0).unwrap(), 0.0);
+		assert_eq!(expr.eval(1.0).unwrap(), -1.0);
 	}
 
 	#[test]

@@ -2,6 +2,7 @@
 
 pub mod binary;
 pub mod constant;
+pub mod factorial;
 pub mod func;
 pub mod func2;
 pub mod lexer;
@@ -14,6 +15,7 @@ pub mod variable;
 
 pub use binary::*;
 pub use constant::*;
+pub use factorial::*;
 pub use func::Func;
 pub use func2::Func2;
 pub use lexer::*;
@@ -28,6 +30,7 @@ pub use variable::*;
 #[derive(Debug, Clone)]
 pub enum Expression {
 	Number(Number),
+	Factorial(Factorial),
 	Constant(Constant),
 	Variable(Variable),
 	Unary(Box<Unary>),
@@ -40,14 +43,15 @@ pub enum Expression {
 impl std::fmt::Display for Expression {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		match self {
-			Expression::Number(number) => number.fmt(f),
-			Expression::Variable(variable) => variable.fmt(f),
-			Expression::Constant(c) => c.fmt(f),
-			Expression::Unary(unary) => unary.fmt(f),
-			Expression::Parenthesis(parenthesis) => parenthesis.fmt(f),
-			Expression::Binary(binary) => binary.fmt(f),
-			Expression::Func(func) => func.fmt(f),
-			Expression::Func2(func) => func.fmt(f),
+			Expression::Number(e) => e.fmt(f),
+			Expression::Factorial(e) => e.fmt(f),
+			Expression::Variable(e) => e.fmt(f),
+			Expression::Constant(e) => e.fmt(f),
+			Expression::Unary(e) => e.fmt(f),
+			Expression::Parenthesis(e) => e.fmt(f),
+			Expression::Binary(e) => e.fmt(f),
+			Expression::Func(e) => e.fmt(f),
+			Expression::Func2(e) => e.fmt(f),
 		}
 	}
 }
@@ -55,25 +59,26 @@ impl std::fmt::Display for Expression {
 impl Function for Expression {
 	fn is_x_valid(&self, x: f32) -> bool {
 		match self {
-			Expression::Unary(unary) => unary.is_x_valid(x),
-			Expression::Parenthesis(parenthesis) => parenthesis.is_x_valid(x),
-			Expression::Binary(binary) => binary.is_x_valid(x),
-			Expression::Func(f) => f.is_x_valid(x),
-			Expression::Func2(f) => f.is_x_valid(x),
+			Expression::Unary(e) => e.is_x_valid(x),
+			Expression::Parenthesis(e) => e.is_x_valid(x),
+			Expression::Binary(e) => e.is_x_valid(x),
+			Expression::Func(e) => e.is_x_valid(x),
+			Expression::Func2(e) => e.is_x_valid(x),
 			_ => true,
 		}
 	}
 
 	fn eval(&self, x: f32) -> Option<f32> {
 		match self {
-			Expression::Number(number) => number.eval(x),
-			Expression::Variable(variable) => variable.eval(x),
-			Expression::Constant(c) => c.eval(x),
-			Expression::Unary(unary) => unary.eval(x),
-			Expression::Parenthesis(parenthesis) => parenthesis.eval(x),
-			Expression::Binary(binary) => binary.eval(x),
-			Expression::Func(f) => f.eval(x),
-			Expression::Func2(f) => f.eval(x),
+			Expression::Number(e) => e.eval(x),
+			Expression::Factorial(e) => e.eval(x),
+			Expression::Variable(e) => e.eval(x),
+			Expression::Constant(e) => e.eval(x),
+			Expression::Unary(e) => e.eval(x),
+			Expression::Parenthesis(e) => e.eval(x),
+			Expression::Binary(e) => e.eval(x),
+			Expression::Func(e) => e.eval(x),
+			Expression::Func2(e) => e.eval(x),
 		}
 	}
 }

@@ -4,7 +4,14 @@ pub const OPERATORS: [&str; 5] = ["**", "+", "-", "*", "/"];
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
 	WhiteSpace(char),
+	/// ```bnf
+	/// number ::= (digit)+ ["." (digit)+]
+	/// ```
 	Number(f32),
+	/// ```bnf
+	/// factorial ::= (digit)+ "!"
+	/// ```
+	Factorial(u32),
 	/// ```bnf
 	/// id ::= ("a"..."z" | "A"..."Z")+
 	/// ```
@@ -129,11 +136,18 @@ impl Lexer {
 			return Some((Token::WhiteSpace(chars[i]), i + 1));
 		}
 
-		// check number
+		// check number & factorial
 		if chars[i].is_ascii_digit() {
 			let mut j = i + 1;
+
 			while chars.get(j).is_some_and(char::is_ascii_digit) {
 				j += 1;
+			}
+
+			if chars.get(j).is_some_and(|c| *c == '!') {
+				let s: String = chars[i..j].iter().collect();
+
+				return Some((Token::Factorial(s.parse().unwrap()), j + 1));
 			}
 
 			if chars.get(j).is_some_and(|c| *c == '.') {
@@ -148,10 +162,10 @@ impl Lexer {
 				}
 			}
 
-			let c: String = chars[i..j].iter().collect();
-			let c: f32 = c.parse().unwrap();
+			let s: String = chars[i..j].iter().collect();
+			let n: f32 = s.parse().unwrap();
 
-			return Some((Token::Number(c), j));
+			return Some((Token::Number(n), j));
 		}
 
 		// check identifier
