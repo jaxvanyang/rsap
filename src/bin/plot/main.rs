@@ -1,11 +1,12 @@
 mod core;
 
-use core::{State, update, view};
+use core::{update, view, State};
 use iced::Theme;
 
 fn main() -> iced::Result {
 	iced::application("Plot", update, view)
 		.theme(theme)
+		.antialiasing(true)
 		.run_with(|| (State::default(), iced::widget::text_input::focus("input")))
 }
 
