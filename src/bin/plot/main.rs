@@ -5,7 +5,7 @@ use iced::Theme;
 
 fn main() -> iced::Result {
 	iced::application(
-		|| (State::default(), iced::widget::text_input::focus("input")),
+		|| (State::default(), iced::widget::operation::focus("input")),
 		update,
 		view,
 	)

@@ -20,7 +20,7 @@ pub fn update(state: &mut State, message: Message) {
 	}
 }
 
-pub fn view(state: &State) -> Element<Message> {
+pub fn view(state: &State) -> Element<'_, Message> {
 	let mut input = text_input("Type function expression", &state.input)
 		.id("input")
 		.on_input(Message::InputChanged)
